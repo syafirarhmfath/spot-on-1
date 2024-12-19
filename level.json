@@ -1,0 +1,24 @@
+{
+  "questions": [
+    {
+      "image": "images/fapsi.png",
+      "correctLocation": { "lat": -6.93074029406141, "lng": 7169765904484 }
+    },
+    {
+      "image": "images/exfebi.jpg",
+      "correctLocation": { "lat": -6.931903001638095, "lng": 107.717259238563 }
+    },
+    {
+      "image": "images/lppm.jpg",
+      "correctLocation": { "lat": -6.9310670328429, "lng": 107.7173557115379 }
+    },
+    {
+      "image": "images/kantin.jpg",
+      "correctLocation": { "lat": 35.6895, "lng": 139.6917 }
+    },
+    {
+      "image": "images/tenis.jpg",
+      "correctLocation": { "lat": 51.5074, "lng": -0.1278 }
+    }
+  ]
+}

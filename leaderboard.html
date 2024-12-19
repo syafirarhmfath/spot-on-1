@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaderboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        text-align: center;
+      }
+      .container {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Leaderboard</h1>
+      <div id="leaderboard"></div>
+      <button onclick="goBack()">Kembali ke Permainan</button>
+    </div>
+
+    <script>
+      function displayLeaderboard() {
+        const playerName = localStorage.getItem("playerName");
+        const score = localStorage.getItem("score");
+
+        const leaderboardDiv = document.getElementById("leaderboard");
+        if (playerName && score) {
+          leaderboardDiv.innerHTML = `<p>Nama Pemain: ${playerName}</p><p>Skor: ${score}</p>`;
+        } else {
+          leaderboardDiv.innerHTML = "<p>Belum ada skor yang tersedia.</p>";
+        }
+      }
+
+      function goBack() {
+        window.location.href = "game.html"; // Arahkan kembali ke halaman permainan
+      }
+
+      // Tampilkan leaderboard saat halaman dimuat
+      window.onload = displayLeaderboard;
+    </script>
+  </body>
+</html>

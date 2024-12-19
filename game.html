@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guess The Location Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sniglet:wght@800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDvJoFL1igGiXzzM22StytgQ8hvDdFbfk&libraries=geometry"></script>
+    <style>
+      /* Tambahkan CSS sesuai kebutuhan */
+      #leaderboard {
+        display: none; /* Sembunyikan leaderboard secara default */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Guess The Location Game</h1>
+      <div id="photo-container">
+        <img id="location-photo" src="images" alt="Location Photo" />
+      </div>
+      <div id="map"></div>
+      <button id="submit">Submit Guess</button>
+      <div id="result"></div>
+      <button id="show-leaderboard">Lihat Skor</button>
+      <div id="leaderboard">
+        <h2>Leaderboard</h2>
+        <ul id="leaderboard-list"></ul>
+      </div>
+      <audio id="correctSound" src="sounds/correct-sound.mp3"></audio>
+      <audio id="incorrectSound" src="sounds/incorrect-sound.mp3"></audio>
+      <audio id="gameOverSound" src="sounds/game-over.mp3"></audio>
+    </div>
+    <script>
+      const questions = [
+        {
+          image: "images/fapsi.png",
+          correctLocation: { lat: -6.93074029406141, lng: 107.7169765904484 },
+        },
+        {
+          image: "images/exfebi.jpg",
+          correctLocation: { lat: -6.931903001638095, lng: 107.717259238563 },
+        },
+        {
+          image: "images/lppm.jpg",
+          correctLocation: { lat: -6.9310670328429, lng: 107.7173557115379 },
+        },
+        {
+          image: "images/kantin.jpg",
+          correctLocation: { lat: -6.930593224336537, lng: 107.71865227729027 },
+        },
+        {
+          image: "images/tenis.jpg",
+          correctLocation: { lat: -6.931019106945067, lng: 107.71897882217587 },
+        },
+      ];
+
+      let map;
+      let marker;
+      let currentQuestionIndex = 0;
+      let playerName = "";
+      let score = 0;
+
+      function initMap() {
+        loadQuestion(currentQuestionIndex);
+      }
+
+      function loadQuestion(index) {
+        if (index >= questions.length) {
+          endGame(); // Panggil fungsi endGame jika semua pertanyaan sudah selesai
+          return;
+        }
+
+        const correctLocation = questions[index].correctLocation;
+        document.getElementById("location-photo").src = questions[index].image;
+
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 10,
+          center: correctLocation,
+        });
+        const initialMarkerPosition = { lat: -6.9177, lng: 107.608 };
+        marker = new google.maps.Marker({
+          position: initialMarkerPosition,
+          map: map,
+          draggable: true,
+        });
+      }
+
+      document.getElementById("submit").addEventListener("click", function () {
+        const userGuess = marker.getPosition(); // Ambil posisi marker sebagai tebakan pengguna
+        const correctLocation = questions[currentQuestionIndex].correctLocation;
+
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(
+          new google.maps.LatLng(userGuess.lat(), userGuess.lng()),
+          new google.maps.LatLng(correctLocation.lat, correctLocation.lng)
+        );
+
+        const maxDistance = 100; // Misalnya, jika jarak maksimum yang diterima adalah 100 meter
+
+        if (distance <= maxDistance) {
+          document.getElementById("result").innerText =
+            "Correct! You guessed the location!";
+          score++;
+          document.getElementById("correctSound").play();
+        } else {
+          const distanceInKm = (distance / 1000).toFixed(2); // Menghitung jarak dalam kilometer
+          document.getElementById(
+            "result"
+          ).innerText = `Incorrect! Try again! The distance to the correct location is ${distanceInKm} km.`;
+          document.getElementById("incorrectSound").play();
+        }
+
+        currentQuestionIndex++; // Move to the next question
+        loadQuestion(currentQuestionIndex); // Muat pertanyaan berikutnya
+      });
+      function endGame() {
+        document.getElementById(
+          "result"
+        ).innerText = `Game Over! Your score is ${score}.`;
+        document.getElementById("gameOverSound").play(); // Putar suara game over
+        document.getElementById("leaderboard").style.display = "block"; // Tampilkan leaderboard
+
+        playerName = prompt("Masukkan nama Anda:"); // Meminta nama pemain
+        saveScore(playerName, score); // Simpan skor pemain
+      }
+      function saveScore(name, score) {
+        let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+        leaderboard.push({ name: name, score: score });
+        leaderboard.sort((a, b) => b.score - a.score); // Urutkan berdasarkan skor tertinggi
+        localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+      }
+      document
+        .getElementById("show-leaderboard")
+        .addEventListener("click", function () {
+          displayLeaderboard(); // Tampilkan leaderboard saat tombol diklik
+        });
+      function displayLeaderboard() {
+        const leaderboard =
+          JSON.parse(localStorage.getItem("leaderboard")) || [];
+        const leaderboardList = document.getElementById("leaderboard-list");
+        leaderboardList.innerHTML = ""; // Kosongkan daftar leaderboard
+
+        leaderboard.forEach((entry) => {
+          const li = document.createElement("li");
+          li.textContent = `${entry.name}: ${entry.score}`;
+          leaderboardList.appendChild(li);
+        });
+
+        document.getElementById("leaderboard").style.display = "block"; // Tampilkan leaderboard
+      }
+
+      window.onload = initMap; // Inisialisasi peta saat halaman dimuat
+    </script>
+     
+  </body>
+</html>
